@@ -1,0 +1,518 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"><title>枚举、注解和反射 | YunPeng's技术博客</title><meta name="keywords" content="Java"><meta name="author" content="yunpeng"><meta name="copyright" content="yunpeng"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="枚举简介JDK1.5引入了新的类型——枚举。 在JDK1.5 之前，我们定义常量都是： public static fianl…. 。很难管理。 枚举，可以把相关的常量分组到一个枚举类型里，而且枚举提供了比常量更多的方法。用于定义有限数量的一组同类常量，例如：">
+<meta property="og:type" content="article">
+<meta property="og:title" content="枚举、注解和反射">
+<meta property="og:url" content="https://pengspace.top/2020/11/16/%E6%9E%9A%E4%B8%BE%E3%80%81%E6%B3%A8%E8%A7%A3%E5%92%8C%E5%8F%8D%E5%B0%84/index.html">
+<meta property="og:site_name" content="YunPeng&#39;s技术博客">
+<meta property="og:description" content="枚举简介JDK1.5引入了新的类型——枚举。 在JDK1.5 之前，我们定义常量都是： public static fianl…. 。很难管理。 枚举，可以把相关的常量分组到一个枚举类型里，而且枚举提供了比常量更多的方法。用于定义有限数量的一组同类常量，例如：">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://s2.loli.net/2022/08/14/OSlNBJfUAcWYIdF.png">
+<meta property="article:published_time" content="2020-11-16T11:24:54.000Z">
+<meta property="article:modified_time" content="2020-11-16T11:48:07.000Z">
+<meta property="article:author" content="yunpeng">
+<meta property="article:tag" content="Java">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://s2.loli.net/2022/08/14/OSlNBJfUAcWYIdF.png"><link rel="shortcut icon" href="/img/favicon16x16.png"><link rel="canonical" href="https://pengspace.top/2020/11/16/%E6%9E%9A%E4%B8%BE%E3%80%81%E6%B3%A8%E8%A7%A3%E5%92%8C%E5%8F%8D%E5%B0%84/"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css" media="print" onload="this.media='all'"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox.min.css" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = { 
+  root: '/',
+  algolia: undefined,
+  localSearch: undefined,
+  translate: {"defaultEncoding":2,"translateDelay":0,"msgToTraditionalChinese":"繁","msgToSimplifiedChinese":"简"},
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlighjs","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false},
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '天',
+  date_suffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  source: {
+    justifiedGallery: {
+      js: 'https://cdn.jsdelivr.net/npm/flickr-justified-gallery/dist/fjGallery.min.js',
+      css: 'https://cdn.jsdelivr.net/npm/flickr-justified-gallery/dist/fjGallery.min.css'
+    }
+  },
+  isPhotoFigcaption: false,
+  islazyload: false,
+  isAnchor: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: '枚举、注解和反射',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: true,
+  postUpdate: '2020-11-16 19:48:07'
+}</script><noscript><style type="text/css">
+  #nav {
+    opacity: 1
+  }
+  .justified-gallery img {
+    opacity: 1
+  }
+
+  #recent-posts time,
+  #post-meta time {
+    display: inline !important
+  }
+</style></noscript><script>(win=>{
+    win.saveToLocal = {
+      set: function setWithExpiry(key, value, ttl) {
+        if (ttl === 0) return
+        const now = new Date()
+        const expiryDay = ttl * 86400000
+        const item = {
+          value: value,
+          expiry: now.getTime() + expiryDay,
+        }
+        localStorage.setItem(key, JSON.stringify(item))
+      },
+
+      get: function getWithExpiry(key) {
+        const itemStr = localStorage.getItem(key)
+
+        if (!itemStr) {
+          return undefined
+        }
+        const item = JSON.parse(itemStr)
+        const now = new Date()
+
+        if (now.getTime() > item.expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return item.value
+      }
+    }
+  
+    win.getScript = url => new Promise((resolve, reject) => {
+      const script = document.createElement('script')
+      script.src = url
+      script.async = true
+      script.onerror = reject
+      script.onload = script.onreadystatechange = function() {
+        const loadState = this.readyState
+        if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+        script.onload = script.onreadystatechange = null
+        resolve()
+      }
+      document.head.appendChild(script)
+    })
+  
+      win.activateDarkMode = function () {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = function () {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
+    
+          if (t === 'dark') activateDarkMode()
+          else if (t === 'light') activateLightMode()
+        
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+    const detectApple = () => {
+      if(/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+    })(window)</script><meta name="generator" content="Hexo 6.2.0"></head><body><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="/img/avatar.png" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="sidebar-site-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">26</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">32</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">7</div></a></div><hr/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> Archives</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> Tags</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> Categories</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background-image: url('https://s2.loli.net/2022/08/14/OSlNBJfUAcWYIdF.png')"><nav id="nav"><span id="blog_name"><a id="site-name" href="/">YunPeng's技术博客</a></span><div id="menus"><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> Archives</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> Tags</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> Categories</span></a></div></div><div id="toggle-menu"><a class="site-page"><i class="fas fa-bars fa-fw"></i></a></div></div></nav><div id="post-info"><h1 class="post-title">枚举、注解和反射</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2020-11-16T11:24:54.000Z" title="发表于 2020-11-16 19:24:54">2020-11-16</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2020-11-16T11:48:07.000Z" title="更新于 2020-11-16 19:48:07">2020-11-16</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/Java%E5%9F%BA%E7%A1%80/">Java基础</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-wordcount"><i class="far fa-file-word fa-fw post-meta-icon"></i><span class="post-meta-label">字数总计:</span><span class="word-count">4.3k</span><span class="post-meta-separator">|</span><i class="far fa-clock fa-fw post-meta-icon"></i><span class="post-meta-label">阅读时长:</span><span>14分钟</span></span><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title="枚举、注解和反射"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">阅读量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><h2 id="枚举"><a href="#枚举" class="headerlink" title="枚举"></a>枚举</h2><h3 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h3><p>JDK1.5引入了新的类型——枚举。</p>
+<p>在JDK1.5 之前，我们定义常量都是： public static fianl…. 。很难管理。</p>
+<p>枚举，可以把相关的常量分组到一个枚举类型里，而且枚举提供了比常量更多的方法。用于定义有限数量的一组同类常量，例如：</p>
+<span id="more"></span>
+<figure class="highlight tex"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">错误级别：</span><br><span class="line">	低、中、高、急</span><br><span class="line">一年的四季：</span><br><span class="line">	春、夏、秋、冬</span><br><span class="line">商品的类型：</span><br><span class="line">	美妆、手机、电脑、男装、女装...</span><br></pre></td></tr></table></figure>
+<p>在枚举类型中定义的常量是该枚举类型的<strong>实例</strong>。</p>
+<h3 id="定义格式"><a href="#定义格式" class="headerlink" title="定义格式"></a>定义格式</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">权限修饰符 <span class="keyword">enum</span> 枚举名称 &#123;</span><br><span class="line">	实例<span class="number">1</span>,实例<span class="number">2</span>，实例<span class="number">3</span>,...实例n;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">enum</span> <span class="title class_">Level</span> &#123;</span><br><span class="line">	LOW(<span class="number">1</span>), MEDIUM(<span class="number">2</span>), HIGH(<span class="number">3</span>), URGENT(<span class="number">4</span>);</span><br><span class="line">	<span class="keyword">private</span> <span class="type">int</span> levelValue;</span><br><span class="line">	<span class="keyword">private</span> <span class="title function_">Level</span><span class="params">(<span class="type">int</span> levelValue)</span> &#123;</span><br><span class="line">		<span class="built_in">this</span>.levelValue = levelValue;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">public</span> <span class="type">int</span> <span class="title function_">getLevelValue</span><span class="params">()</span> &#123;</span><br><span class="line">		<span class="keyword">return</span> levelValue;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">enum</span> <span class="title class_">Level</span> &#123;				<span class="comment">//这样的方式更常用，通过字面意思就能理解枚举中常量的含义</span></span><br><span class="line">	LOW, MEDIUM, HIGH, URGENT;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="枚举类的主要方法"><a href="#枚举类的主要方法" class="headerlink" title="枚举类的主要方法"></a>枚举类的主要方法</h3><p>Enum<font color =red>抽象类</font>常见方法</p>
+<p>Enum是所有Java语言枚举类型的公共基本类，以下是它的常见方法：</p>
+<div class="table-container">
+<table>
+<thead>
+<tr>
+<th style="text-align:center">变量和类型</th>
+<th style="text-align:center">方法</th>
+<th style="text-align:center">描述</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center"><code>protected Object</code></td>
+<td style="text-align:center"><code>clone()</code></td>
+<td style="text-align:center">抛出CloneNotSupportedException。</td>
+</tr>
+<tr>
+<td style="text-align:center"><code>int</code></td>
+<td style="text-align:center"><code>compareTo(E o)</code></td>
+<td style="text-align:center">将此枚举与指定的对象进行比较。</td>
+</tr>
+<tr>
+<td style="text-align:center"><code>boolean</code></td>
+<td style="text-align:center"><code>equals(Object other)</code></td>
+<td style="text-align:center">如果指定的对象等于此枚举常量，则返回true。</td>
+</tr>
+<tr>
+<td style="text-align:center"><code>Class&lt;?&gt;</code></td>
+<td style="text-align:center"><code>getDeclaringClass()</code></td>
+<td style="text-align:center">返回与此枚举常量的枚举类型对应的Class对象。</td>
+</tr>
+<tr>
+<td style="text-align:center"><code>int</code></td>
+<td style="text-align:center"><code>hashCode()</code></td>
+<td style="text-align:center">返回此枚举常量的哈希码。</td>
+</tr>
+<tr>
+<td style="text-align:center"><code>String</code></td>
+<td style="text-align:center"><code>name()</code></td>
+<td style="text-align:center">返回此枚举常量的名称，与其枚举声明中声明的完全相同。</td>
+</tr>
+<tr>
+<td style="text-align:center"><code>int</code></td>
+<td style="text-align:center"><code>ordinal()</code></td>
+<td style="text-align:center">返回此枚举常量的序数（它在枚举声明中的位置，其中初始常量的序数为零）。</td>
+</tr>
+<tr>
+<td style="text-align:center"><code>String</code></td>
+<td style="text-align:center"><code>toString()</code></td>
+<td style="text-align:center">返回声明中包含的此枚举常量的名称。</td>
+</tr>
+<tr>
+<td style="text-align:center"><code>static&lt;T extends Enum&lt;T&gt;&gt; T</code></td>
+<td style="text-align:center"><code>valueOf(Class&lt;T&gt; enumType, String name)</code></td>
+<td style="text-align:center">返回具有指定名称的指定枚举类型的枚举常量。</td>
+</tr>
+</tbody>
+</table>
+</div>
+<blockquote>
+<p>  以上方法中，只有toString()方法可以被重写</p>
+</blockquote>
+<h3 id="实现接口的枚举类"><a href="#实现接口的枚举类" class="headerlink" title="实现接口的枚举类"></a>实现接口的枚举类</h3><p>所有的枚举都继承自java.lang.Enum类。由于Java 不支持多继承，所以枚举对象不能再继承其他类。<br>每个枚举对象，都可以实现自己的抽象方法</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">interface</span> <span class="title class_">LShow</span>&#123;</span><br><span class="line">	<span class="keyword">void</span> <span class="title function_">show</span><span class="params">()</span>;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">public</span> <span class="keyword">enum</span> <span class="title class_">Level</span> <span class="keyword">implements</span> <span class="title class_">LShow</span>&#123;</span><br><span class="line">	LOW&#123;</span><br><span class="line">		<span class="meta">@Override</span></span><br><span class="line">		<span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">show</span><span class="params">()</span>&#123;</span><br><span class="line">			<span class="comment">//...</span></span><br><span class="line">		&#125;</span><br><span class="line">	&#125;,MEDIUM&#123;</span><br><span class="line">		<span class="meta">@Override</span></span><br><span class="line">		<span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">show</span><span class="params">()</span>&#123;</span><br><span class="line">			<span class="comment">//...</span></span><br><span class="line">		&#125;</span><br><span class="line">	&#125;,HIGH&#123;</span><br><span class="line">		<span class="meta">@Override</span></span><br><span class="line">		<span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">show</span><span class="params">()</span>&#123;</span><br><span class="line">			<span class="comment">//...</span></span><br><span class="line">		&#125;</span><br><span class="line">	&#125;;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="注意事项"><a href="#注意事项" class="headerlink" title="注意事项"></a>注意事项</h3><ul>
+<li>一旦定义了枚举，最好不要妄图修改里面的值，除非修改是必要的。</li>
+<li>枚举类默认继承的是java.lang.Enum类而不是Object类</li>
+<li>枚举类不能有子类，因为其枚举类默认被final修饰</li>
+<li>只能有private构造方法</li>
+<li>switch中使用枚举时，直接使用常量名，不用携带类名</li>
+<li>不能定义name属性，因为自带name属性</li>
+<li>不要为枚举类中的属性提供set方法，不符合枚举最初设计初衷。</li>
+</ul>
+<h2 id="注解"><a href="#注解" class="headerlink" title="注解"></a>注解</h2><h3 id="简介-1"><a href="#简介-1" class="headerlink" title="简介"></a>简介</h3><p>Java 注解（Annotation）又称 Java 标注，是 JDK5.0 引入的一种注释机制。</p>
+<p>Java 语言中的类、方法、变量、参数和包等都可以被标注。和注释不同，Java 标注可以通过反射获取标<br>注内容。在编译器生成类文件时，标注可以被嵌入到字节码中。Java 虚拟机可以保留标注内容，在运行<br>时可以获取到标注内容 。 当然它也支持自定义 Java 标注。</p>
+<p>主要用于：编译格式检查、反射中解析、生成帮助文档、跟踪代码依赖等</p>
+<h3 id="内置注解"><a href="#内置注解" class="headerlink" title="内置注解"></a>内置注解</h3><ul>
+<li><p><code>@Override</code>： 重写 </p>
+<ul>
+<li>定义在java.lang.Override</li>
+</ul>
+</li>
+<li><p><code>@Deprecated</code>：废弃 </p>
+<ul>
+<li>定义在java.lang.Deprecated</li>
+</ul>
+</li>
+<li><p><code>@SafeVarargs</code></p>
+<ul>
+<li>Java 7 开始支持，忽略任何使用参数为泛型变量的方法或构造函数调用产生的警告。</li>
+</ul>
+</li>
+<li><p><code>@FunctionalInterface</code>： 函数式接口 </p>
+<ul>
+<li>Java 8 开始支持，标识一个匿名函数或函数式接口。</li>
+</ul>
+</li>
+<li><p><code>@Repeatable</code>：标识某注解可以在同一个声明上使用多次</p>
+</li>
+<li><p>Java 8 开始支持，标识某注解可以在同一个声明上使用多次。</p>
+</li>
+<li><p><code>SuppressWarnings()</code>  抑制编译时的警告信息。 </p>
+<ul>
+<li><p>定义在java.lang.SuppressWarnings</p>
+</li>
+<li><p>三种使用方式</p>
+<ul>
+<li><code>@SuppressWarnings(&quot;unchecked&quot;)</code> ： 抑制单类型的警告</li>
+<li><code>@SuppressWarnings(&quot;unchecked&quot;,&quot;rawtypes&quot;)</code>：抑制多类型的警告</li>
+<li><code>@SuppressWarnings(&quot;all&quot;)</code>：抑制所有类型的警告</li>
+</ul>
+</li>
+<li><p>参数列表：</p>
+<ul>
+<li>| 关键字                   | 用途                                               |<br>| ———————————— | ————————————————————————— |<br>| all                      | 抑制所有警告                                       |<br>| boxing                   | 抑制装箱、拆箱操作时候的警告                       |<br>| cast                     | 抑制映射相关的警告                                 |<br>| dep-ann                  | 抑制启用注释的警告                                 |<br>| deprecation              | 抑制过期方法警告                                   |<br>| fallthrough              | 抑制确在switch中缺失breaks的警告                   |<br>| finally                  | 抑制finally模块没有返回的警告                      |<br>| hiding                   | 抑制相对于隐藏变量的局部变量的警告                 |<br>| incomplete-switch        | 忽略没有完整的switch语句                           |<br>| nls                      | 忽略非nls格式的字符                                |<br>| null                     | 忽略对null的操作                                   |<br>| rawtypes                 | 使用generics时忽略没有指定相应的类型               |<br>| restriction              | 抑制禁止使用劝阻或禁止引用的警告                   |<br>| serial                   | 忽略在serializable类中没有声明serialVersionUID变量 |<br>| static-access            | 抑制不正确的静态访问方式警告                       |<br>| synthetic-access         | 抑制子类没有按最优方法访问内部类的警告             |<br>| unchecked                | 抑制没有进行类型检查操作的警告                     |<br>| unqualified-field-access | 抑制没有权限访问的域的警告                         |<br>| unused                   | 抑制没被使用过的代码的警告                         |</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h3 id="元注解"><a href="#元注解" class="headerlink" title="元注解"></a>元注解</h3><p>元注解就是<strong>作用在其他注解</strong>的注解。有下面几种：</p>
+<ul>
+<li><p><code>@Retention</code>- 标识这个注解怎么保存，是只在代码中，还是编入class文件中，或者是在运行时可以通过反射访问。</p>
+</li>
+<li><p><code>@Documented</code> - 标记这些注解是否包含在用户文档中。</p>
+</li>
+<li><p><code>@Target</code> - 标记这个注解应该是哪种 Java 成员。</p>
+</li>
+<li><p><code>@Inherited</code> - 标记这个注解是自动继承的</p>
+<ul>
+<li>子类会继承父类使用的注解中被<code>@Inherited</code>修饰的注解</li>
+</ul>
+<ol>
+<li>接口继承关系中，子接口不会继承父接口中的任何注解，不管父接口中使用的注解有没有<br> 被<code>@Inherited</code>修饰</li>
+<li>类实现接口时不会继承任何接口中定义的注解</li>
+</ol>
+</li>
+</ul>
+<h3 id="自定义注解"><a href="#自定义注解" class="headerlink" title="自定义注解"></a>自定义注解</h3><h4 id="注解架构"><a href="#注解架构" class="headerlink" title="注解架构"></a>注解架构</h4><p><img src="https://i.loli.net/2020/10/26/e5pqFSIxH2NdlUn.png" alt=""></p>
+<ul>
+<li><p><strong><code>Annotation</code>与<code>RetentionPolicy</code> 、<code>ElementType</code> 。</strong></p>
+<p>每 1 个 <code>Annotation</code> 对象，都会有<strong>唯一的 <code>RetentionPolicy</code> 属性，有 1~n个<code>ElementType</code>属性</strong>。</p>
+</li>
+<li><p><strong><code>ElementType</code>(注解的用途类型)</strong></p>
+<p>“每 1 个 <code>Annotation</code>“ 都与 “1～n 个 <code>ElementType</code>“ 关联。当 <code>Annotation</code> 与某个 <code>ElementType</code> 关联时，就意味着：<code>Annotation</code>有了某种用途。例如，若一个 <code>Annotation</code> 对象是 <code>METHOD</code> 类型，则该<code>Annotation</code> 只能用来修饰方法。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> java.lang.annotation;</span><br><span class="line"><span class="keyword">public</span> <span class="keyword">enum</span> <span class="title class_">ElementType</span> &#123;</span><br><span class="line">	TYPE, 			<span class="comment">// 类、接口（包括注释类型）或枚举声明 </span></span><br><span class="line">	FIELD,  		<span class="comment">// 字段声明（包括枚举常量）</span></span><br><span class="line">	METHOD, 		<span class="comment">// 方法声明 </span></span><br><span class="line">	PARAMETER,  	<span class="comment">// 参数声明 </span></span><br><span class="line">	CONSTRUCTOR,  	<span class="comment">// 构造方法声明 </span></span><br><span class="line">	LOCAL_VARIABLE, <span class="comment">// 局部变量声明 </span></span><br><span class="line">	ANNOTATION_TYPE,<span class="comment">// 注释类型声明 </span></span><br><span class="line">	PACKAGE 		<span class="comment">// 包声明 </span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p><strong><code>RetentionPolicy</code>（注解作用域策略）</strong>。</p>
+<p>“每 1 个 <code>Annotation</code>“ 都与 “1 个 <code>RetentionPolicy</code>“ 关联。</p>
+<ul>
+<li>若 <code>Annotation</code> 的类型为 <code>SOURCE</code>，则意味着：<code>Annotation</code> 仅存在于编译器处理期间，编译器处理完之后，该<code>Annotation</code> 就没用了。 例如，”<code>@Override</code>“ 标志就是一个 <code>Annotation</code>。当它修饰一个方法的时候，就意味着该方法覆盖父类的方法；并且在编译期间会进行语法检查！编译器处理完后，”<code>@Override</code>“ 就没有任何作用了。</li>
+<li>若 <code>Annotation</code> 的类型为 <code>CLASS</code>，则意味着：编译器将 <code>Annotation</code> 存储于类对应的 <code>.class</code>文件中，它是 <code>Annotation</code> 的默认行为。</li>
+<li>若 <code>Annotation</code> 的类型为 <code>RUNTIME</code>，则意味着：编译器将 <code>Annotation</code> 存储于 <code>.class</code> 文件中，并且可由JVM读入。</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> java.lang.annotation;</span><br><span class="line"><span class="keyword">public</span> <span class="keyword">enum</span> <span class="title class_">RetentionPolicy</span> &#123;</span><br><span class="line">	SOURCE, <span class="comment">//Annotation信息仅存在于编译器处理期间，编译器处理完之后就没有该Annotation信息了</span></span><br><span class="line">	CLASS, 	<span class="comment">//编译器将Annotation存储于类对应的.class文件中。默认行为</span></span><br><span class="line">	RUNTIME <span class="comment">//编译器将Annotation存储于class文件中，并且可由JVM读入 </span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<h4 id="定义格式-1"><a href="#定义格式-1" class="headerlink" title="定义格式"></a>定义格式</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@interface</span> 自定义注解名&#123;&#125;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>  注意事项</p>
+<ol>
+<li>定义的注解，自动继承了java.lang.annotation.Annotation接口</li>
+<li><strong>注解中的每一个方法，实际是声明的注解配置参数</strong><ul>
+<li>方法的名称就是配置参数的名称</li>
+<li>方法的返回值类型，就是配置参数的类型。只能是：基本类型/Class/String/enum</li>
+</ul>
+</li>
+<li>可以通过default来声明参数的默认值</li>
+<li>如果只有一个参数成员，一般参数名为value</li>
+<li>注解元素必须要有值，我们定义注解元素时，经常使用空字符串、 0 作为默认值。</li>
+</ol>
+</blockquote>
+<p><strong>案例</strong></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Documented</span></span><br><span class="line"><span class="meta">@Target(ElementType.TYPE)</span></span><br><span class="line"><span class="meta">@Retention(RetentionPolicy.RUNTIME)</span></span><br><span class="line"><span class="keyword">public</span> <span class="meta">@interface</span> MyAnnotation1 &#123;</span><br><span class="line">	参数类型 参数名() <span class="keyword">default</span> 默认值;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>上面代码的作用是定义一个 <code>Annotation</code>，我们可以在代码中通过 “<code>@MyAnnotation1</code>“ 来使用它。<br><code>@Documented</code>， <code>@Target</code>，<code>@Retention</code>，<code>@interface</code> 都是来修饰 <code>MyAnnotation1</code> 的。含义：</p>
+<ul>
+<li><p><code>@interface</code></p>
+<p>使用 <code>@interface</code> 定义注解时，意味着它实现了 <code>java.lang.annotation.Annotation</code> 接口，即该注解就是<code>一个Annotation</code>。</p>
+<blockquote>
+  <font color = red>定义`Annotation` 时，`@interface` 是必须的。</font>
+
+<p>  注意：它和我们通常的 <code>implemented</code> 实现接口的方法不同。<code>Annotation</code> 接口的实现细节都由编译器完成。通过 <code>@interface</code> 定义注解后，该注解不能继承其他的注解或接口。</p>
+</blockquote>
+</li>
+<li><p><code>@Documented</code></p>
+<p>类和方法的 <code>Annotation</code> 在缺省情况下是不出现在 <code>javadoc</code> 中的。如果使用 <code>@Documented</code> 修饰该<br><code>Annotation</code>，则表示它可以出现在 <code>javadoc</code> 中。</p>
+<blockquote>
+<p>  定义 <code>Annotation</code> 时，<strong><code>@Documented</code>可有可无</strong>；若没有定义，则 <code>Annotation</code> 不会出现在 <code>javadoc</code>中。</p>
+</blockquote>
+</li>
+<li><p><code>@Target(ElementType.TYPE)</code></p>
+<p><code>ElementType</code> 是 <code>Annotation</code> 的类型属性。而 <code>@Target</code> 的作用，就是来指定<code>Annotation</code> 的类型属性的。</p>
+<p><code>@Target(ElementType.TYPE)</code> 的意思就是指定该 <code>Annotation</code> 的类型是 <code>ElementType.TYPE</code>。这就意味着，<code>MyAnnotation1</code> 是来修饰”类、接口（包括注释类型）或枚举声明”的注解。</p>
+<blockquote>
+<p>  定义 <code>Annotation</code> 时，<strong><code>@Target</code> 可有可无</strong>。若有 <code>@Target</code>，则该 <code>Annotation</code> 只能用于它所指定的地方；若没有 <code>@Target</code>，则该 <code>Annotation</code> 可以用于任何地方。</p>
+</blockquote>
+</li>
+<li><p><code>@Retention(RetentionPolicy.RUNTIME)</code></p>
+<p><code>RetentionPolicy</code> 是 <code>Annotation</code> 的策略属性，而 <code>@Retention</code> 的作用，就是指定<code>Annotation</code> 的策略属性。</p>
+<p><code>@Retention(RetentionPolicy.RUNTIME)</code> 的意思就是指定该 <code>Annotation</code> 的策略是<br><code>RetentionPolicy.RUNTIME</code>。这就意味着，编译器会将该 <code>Annotation</code> 信息保留在 <code>.class</code>文件中，并且能被JVM虚拟机读取。</p>
+<blockquote>
+<p>  定义 <code>Annotation</code> 时，<code>@Retention</code>可有可无。若没有 <code>@Retention</code>，则默认是<br>  <code>RetentionPolicy.CLASS</code>。</p>
+</blockquote>
+</li>
+</ul>
+<h2 id="反射"><a href="#反射" class="headerlink" title="反射"></a>反射</h2><h3 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h3><p><a target="_blank" rel="noopener" href="https://baike.baidu.com/item/JAVA%E5%8F%8D%E5%B0%84%E6%9C%BA%E5%88%B6/6015990?fr=aladdin">JAVA反射机制</a>是在运行状态中，获取任意一个类的结构 、 创建对象 、得到方法、执行方法 、属性，这种在运行状态动态获取信息以及动态调用对象方法的功能被称为java语言的反射机制。</p>
+<h3 id="类加载器"><a href="#类加载器" class="headerlink" title="类加载器"></a>类加载器</h3><p>Java类加载器（Java Classloader）是Java运行时环境（Java Runtime Environment）的一部分，负责动态加载Java类到Java虚拟机的内存空间中。</p>
+<p>java默认有三种类加载器:<code>BootstrapClassLoader</code>、<code>ExtensionClassLoader</code>、<code>App ClassLoader</code>。</p>
+<ul>
+<li><p><strong>BootstrapClassLoader（引导启动类加载器）：</strong><br>嵌在JVM内核中的加载器，该加载器是用C++语言（原生语言）写的，主要负载加载JAVA_HOME/lib下的类库，引导启动类加载器无法被应用程序直接使用。</p>
+</li>
+<li><p><strong>ExtensionClassLoader（扩展类加载器）</strong>：<br>ExtensionClassLoader是用JAVA编写，且它的父类加载器是Bootstrap。</p>
+<p>是由sun.misc.Launcher$ExtClassLoader实现的，主要加载JAVA_HOME/lib/ext目录中的类库。</p>
+</li>
+<li><p><strong>App ClassLoader（应用类加载器）</strong>：<br>App ClassLoader是应用程序类加载器，负责加载应用程序classpath目录下的所有jar和class文<br>件。它的父加载器为Ext ClassLoader</p>
+</li>
+</ul>
+<p><img src="https://i.loli.net/2020/10/26/TGtjSkCnMwp8qUO.png" alt=""></p>
+<blockquote>
+<p>  类通常是按需加载，即第一次使用该类时才加载。由于有了类加载器，Java运行时系统不需要知道文件与文件系统。</p>
+<p>  <strong>委派</strong></p>
+<p>  双亲委派模型：<font color = red>如果一个类加载器收到了一个类加载请求，它不会自己去尝试加载这个类，而是把这个请求转交给父类加载器去完成</font>。每一个层次的类加载器都是如此。因此所有的类加载请求都应该传递到最顶层的启动类加载器中，只有到父类加载器反馈自己无法完成这个加载请求（在它的搜索范围没有找到这个类）时，子类加载器才会尝试自己去加载。委派的好处就是避免有些类被重复加载。</p>
+<p>  <strong>加载配置文件</strong></p>
+<p>  如果我们的项目下有source文件夹，类.class.getClassLoader().getResourceAsStream(文件名)加载的是source文件夹下的文件，前提是将文件夹定义为Resources Root</p>
+<p>  <img src="https://i.loli.net/2020/10/26/4THGmUu6PEno3qk.png" alt="image-20201026212548653"></p>
+<p>  <img src="https://i.loli.net/2020/10/26/JqeIEhX34APUScv.png" alt=""></p>
+</blockquote>
+<h3 id="获取类对象"><a href="#获取类对象" class="headerlink" title="获取类对象"></a>获取类对象</h3><p>要想了解一个类，必须先要获取到该类的字节码文件对象。在Java中，每一个字节码文件，被加载到内存后，都存在一个对应的Class类型的对象</p>
+<p><strong>得到Class的几种方式</strong></p>
+<ol>
+<li><p>如果在编写代码时, 知道类的名称, 且类已经存在, 可以通过下面代码得到一个类的 类对象</p>
+ <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">包名.类名.class</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>如果拥有类的对象, 可以通过下面代码得到一个类的类对象</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Class 对象.getClass() </span><br></pre></td></tr></table></figure>
+</li>
+<li><p>如果在编写代码时, 知道类的名称 , 可以通过下面代码得到一个类的类对象</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Class.forName(<span class="string">&quot;包名.类名&quot;</span>);</span><br></pre></td></tr></table></figure>
+</li>
+</ol>
+<p>上述的三种方式, 在调用时, 如果类在内存中不存在, 则会加载到内存! 如果类已经在内存中存在, 不会重复加载, 而是重复利用!</p>
+<p><img src="https://i.loli.net/2020/10/26/2X4A53NFvROnwGx.png" alt=""></p>
+<blockquote>
+<p>  (一个class文件 在内存中不会存在两个类对象 )</p>
+<p>  特殊的类对象</p>
+<ul>
+<li>基本数据类型的类对象:<ul>
+<li>基本数据类型.class</li>
+<li>包装类.type</li>
+</ul>
+</li>
+<li>基本数据类型包装类对象:<ul>
+<li>包装类.class</li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<h3 id="获取Constructor"><a href="#获取Constructor" class="headerlink" title="获取Constructor"></a>获取Constructor</h3><p><strong>通过class对象 获取一个类的构造方法</strong></p>
+<ol>
+<li><p>通过指定的参数类型, 获取指定的单个构造方法</p>
+ <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">getConstructor(参数类型的class对象数组)</span><br></pre></td></tr></table></figure>
+<p> 例如，构造方法如下: </p>
+ <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Person(String name,<span class="type">int</span> age)</span><br></pre></td></tr></table></figure>
+<p> 得到这个构造方法的代码如下:</p>
+ <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">Constructor</span> <span class="variable">c</span> <span class="operator">=</span> p.getClass().getConstructor(String.class,<span class="type">int</span>.class);</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>获取构造方法数组</p>
+ <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">getConstructors();</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>获取所有权限的单个构造方法</p>
+ <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">getDeclaredConstructor(参数类型的class对象数组)</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>获取所有权限的构造方法数组</p>
+ <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">getDeclaredConstructors();</span><br></pre></td></tr></table></figure>
+</li>
+</ol>
+<p><strong>Constructor 创建对象</strong></p>
+<p>常用方法:</p>
+<ul>
+<li><p><code>newInstance(Object... para)</code></p>
+<p>调用这个构造方法, 把对应的对象创建出来<br>参数: 是一个Object类型可变参数, 传递的参数顺序 必须匹配构造方法中形式参数列表的顺序!</p>
+</li>
+<li><p><code>setAccessible(boolean flag)</code><br>如果flag为true 则表示忽略访问权限检查 !(可以访问任何权限的方法)</p>
+</li>
+</ul>
+<p><img src="https://i.loli.net/2020/10/26/OUb4plBsyCr7gX2.png" alt=""></p>
+<h3 id="获取Method"><a href="#获取Method" class="headerlink" title="获取Method"></a>获取Method</h3><p><strong>通过class对象获取一个类的方法</strong></p>
+<ol>
+<li><p>根据参数列表的类型和方法名, 得到一个方法(public修饰的)</p>
+ <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">getMethod(String methodName , class... clss)</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>得到一个类的所有方法 (public修饰的)</p>
+ <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">getMethods()</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>根据参数列表的类型和方法名, 得到一个方法(除继承以外所有的:包含私有，公有， 保护， 默认)</p>
+ <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">getDeclaredMethod(String methodName , class... clss)</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>得到一个类的所有方法 (除继承以外所有的:包含私有，公有， 保护， 默认)</p>
+ <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">getDeclaredMethods()</span><br></pre></td></tr></table></figure>
+</li>
+</ol>
+<p><strong>Method 执行方法</strong></p>
+<ul>
+<li><p><code>invoke(Object o,Object... para)</code></p>
+<p>参数1. 要调用方法的对象<br>参数2. 要传递的参数列表</p>
+</li>
+<li><p><code>getName()</code><br>获取方法的方法名称</p>
+</li>
+<li><p><code>setAccessible(boolean flag)</code><br>如果flag为true 则{表示忽略访问权限检查 !(可以访问任何权限的方法)</p>
+</li>
+</ul>
+<p><img src="https://i.loli.net/2020/10/26/u3T6tlMyavn59Kf.png" alt=""></p>
+<h3 id="获取Field"><a href="#获取Field" class="headerlink" title="获取Field"></a>获取Field</h3><p><strong>通过class对象 获取一个类的属性</strong></p>
+<ol>
+<li><p>根据属性的名称, 获取一个属性对象 (所有属性)</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">getDeclaredField(String filedName)</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>获取所有属性(所有权限)</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">getDeclaredFields()</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>根据属性的名称, 获取一个属性对象 (public属性)</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">getField(String filedName)</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>获取所有属性 (public)</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">getFields()</span><br></pre></td></tr></table></figure>
+</li>
+</ol>
+<p><strong>Field 属性的对象类型</strong></p>
+<p>常用方法:</p>
+<ul>
+<li><p><code>get(Object o)</code></p>
+<p>参数: 要获取属性的对象，获取指定对象的此属性值</p>
+</li>
+<li><p><code>set(Object o , Object value)</code></p>
+<p>参数1.要设置属性值的对象，参数2. 要设置的值。设置指定对象的属性的值</p>
+</li>
+<li><p><code>getName()</code><br>获取属性的名称</p>
+</li>
+<li><p><code>setAccessible(boolean flag)</code></p>
+<p>如果flag为true 则表示忽略访问权限检查 !(可以访问任何权限的属性)</p>
+</li>
+</ul>
+<p><img src="https://i.loli.net/2020/10/26/JzatTMCxEkdjfZw.png" alt=""></p>
+<h3 id="获取注解信息"><a href="#获取注解信息" class="headerlink" title="获取注解信息"></a>获取注解信息</h3><p><strong>获取类/属性/方法的全部注解对象</strong></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">Annotation[] annotations = Class/Field/Method.getAnnotations();</span><br><span class="line"><span class="keyword">for</span> (Annotation annotation : annotations) &#123;</span><br><span class="line">    System.out.println(annotation);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><strong>根据类型获取类/属性/方法的注解对象</strong></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">注解类型 对象名 = (注解类型) c.getAnnotation(注解类型.class);</span><br></pre></td></tr></table></figure>
+<p><img src="https://i.loli.net/2020/10/26/ZuIB4gvK5yWfUxD.png" alt=""></p>
+<h2 id="内省"><a href="#内省" class="headerlink" title="内省"></a>内省</h2><h3 id="简介-2"><a href="#简介-2" class="headerlink" title="简介"></a>简介</h3><p>内省即基于反射 ，java所提供的一套应用到JavaBean的API。</p>
+<blockquote>
+<p>  一个定义在包中的类 ，拥有无参构造器，所有属性私有，所有属性提供get/set方法，实现了序列化接口。这种类, 我们称其为 bean类。</p>
+<p>  Java提供了一套java.beans包的api ，对反射的操作，进行了封装!</p>
+</blockquote>
+<h3 id="Introspector"><a href="#Introspector" class="headerlink" title="Introspector"></a>Introspector</h3><p>获取Bean类信息，方法:</p>
+<p><code>BeanInfo getBeanInfo(Class cls)</code> :通过传入的类信息, 得到这个Bean类的封装对象.</p>
+<h3 id="BeanInfo"><a href="#BeanInfo" class="headerlink" title="BeanInfo"></a>BeanInfo</h3><p>常用的方法:</p>
+<p><code>MethodDescriptor[] getPropertyDescriptors()</code>:获取bean类的 get/set方法 数组</p>
+<h3 id="MethodDescriptor"><a href="#MethodDescriptor" class="headerlink" title="MethodDescriptor"></a>MethodDescriptor</h3><p>常用方法:</p>
+<p><code>Method getReadMethod()</code>：获取一个get方法</p>
+<p><code>Method getWriteMethod()</code>：获取一个set方法</p>
+<font color = red>有可能返回null 注意加判断!</font>
+
+<p><img src="https://i.loli.net/2020/10/26/8UqRoVuAdaIewJ6.png" alt="image-20201026234226051"></p>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta">文章作者: </span><span class="post-copyright-info"><a href="https://pengspace.top">yunpeng</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta">文章链接: </span><span class="post-copyright-info"><a href="https://pengspace.top/2020/11/16/%E6%9E%9A%E4%B8%BE%E3%80%81%E6%B3%A8%E8%A7%A3%E5%92%8C%E5%8F%8D%E5%B0%84/">https://pengspace.top/2020/11/16/%E6%9E%9A%E4%B8%BE%E3%80%81%E6%B3%A8%E8%A7%A3%E5%92%8C%E5%8F%8D%E5%B0%84/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta">版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来自 <a href="https://pengspace.top" target="_blank">YunPeng's技术博客</a>！</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/Java/">Java</a></div><div class="post_share"><div class="social-share" data-image="https://s2.loli.net/2022/08/14/OSlNBJfUAcWYIdF.png" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/js/social-share.min.js" defer></script></div></div><div class="post-reward"><div class="reward-button"><i class="fas fa-qrcode"></i> 打赏</div><div class="reward-main"><ul class="reward-all"><li class="reward-item"><a href="/img/wechatpay.jpg" target="_blank"><img class="post-qr-code-img" src="/img/wechatpay.jpg" alt="微信"/></a><div class="post-qr-code-desc">微信</div></li><li class="reward-item"><a href="/img/alipay.jpg" target="_blank"><img class="post-qr-code-img" src="/img/alipay.jpg" alt="支付宝"/></a><div class="post-qr-code-desc">支付宝</div></li></ul></div></div><nav class="pagination-post" id="pagination"><div class="prev-post pull-left"><a href="/2020/11/16/%E7%A7%BB%E5%8A%A8%E7%AB%AF%E5%B8%83%E5%B1%80/"><img class="prev-cover" src="https://s2.loli.net/2022/08/14/7J9RvVH8husy5BE.png" onerror="onerror=null;src='/img/404.jpg'" alt="cover of previous post"><div class="pagination-info"><div class="label">上一篇</div><div class="prev_info">移动端布局</div></div></a></div><div class="next-post pull-right"><a href="/2020/10/24/XML%E5%92%8CJSON%E7%9A%84%E4%BD%BF%E7%94%A8%EF%BC%88java%EF%BC%89/"><img class="next-cover" src="https://s2.loli.net/2022/08/14/7J9RvVH8husy5BE.png" onerror="onerror=null;src='/img/404.jpg'" alt="cover of next post"><div class="pagination-info"><div class="label">下一篇</div><div class="next_info">XML和JSON的使用（java）</div></div></a></div></nav><div class="relatedPosts"><div class="headline"><i class="fas fa-thumbs-up fa-fw"></i><span>相关推荐</span></div><div class="relatedPosts-list"><div><a href="/2020/10/24/Java%E5%A4%9A%E7%BA%BF%E7%A8%8B/" title="Java多线程"><img class="cover" src="https://s2.loli.net/2022/08/14/4bGjC1YzqQpIKBZ.jpg" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2020-10-24</div><div class="title">Java多线程</div></div></a></div><div><a href="/2020/05/24/Java%E6%95%B0%E7%BB%84/" title="Java数组"><img class="cover" src="https://s2.loli.net/2022/08/14/OSlNBJfUAcWYIdF.png" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2020-05-24</div><div class="title">Java数组</div></div></a></div><div><a href="/2020/05/30/Java%E6%96%B9%E6%B3%95/" title="Java方法"><img class="cover" src="https://s2.loli.net/2022/08/14/7J9RvVH8husy5BE.png" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2020-05-30</div><div class="title">Java方法</div></div></a></div><div><a href="/2020/10/24/Java%E6%B3%9B%E5%9E%8B/" title="Java泛型"><img class="cover" src="https://s2.loli.net/2022/08/14/4bGjC1YzqQpIKBZ.jpg" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2020-10-24</div><div class="title">Java泛型</div></div></a></div><div><a href="/2020/10/11/Java%E5%BC%82%E5%B8%B8%E5%A4%84%E7%90%86/" title="Java异常处理"><img class="cover" src="https://s2.loli.net/2022/08/14/4bGjC1YzqQpIKBZ.jpg" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2020-10-11</div><div class="title">Java异常处理</div></div></a></div><div><a href="/2020/05/19/Java%E6%B5%81%E7%A8%8B%E6%8E%A7%E5%88%B6/" title="Java流程控制"><img class="cover" src="https://s2.loli.net/2022/08/14/7J9RvVH8husy5BE.png" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2020-05-19</div><div class="title">Java流程控制</div></div></a></div></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="is-center"><div class="avatar-img"><img src="/img/avatar.png" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info__name">yunpeng</div><div class="author-info__description"></div></div><div class="card-info-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">26</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">32</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">7</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/AnswerCoder"><i class="fab fa-github"></i><span>Follow Me</span></a><div class="card-info-social-icons is-center"><a class="social-icon" href="https://github.com/AnswerCoder" target="_blank" title="Github"><i class="fab fa-github"></i></a><a class="social-icon" href="mailto:zhangyp1015@163.com" target="_blank" title="Email"><i class="fas fa-envelope"></i></a></div></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>公告</span></div><div class="announcement_content">外面的声音太嘈杂，听自己的心就好</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%9E%9A%E4%B8%BE"><span class="toc-number">1.</span> <span class="toc-text">枚举</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%AE%80%E4%BB%8B"><span class="toc-number">1.1.</span> <span class="toc-text">简介</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%AE%9A%E4%B9%89%E6%A0%BC%E5%BC%8F"><span class="toc-number">1.2.</span> <span class="toc-text">定义格式</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%9E%9A%E4%B8%BE%E7%B1%BB%E7%9A%84%E4%B8%BB%E8%A6%81%E6%96%B9%E6%B3%95"><span class="toc-number">1.3.</span> <span class="toc-text">枚举类的主要方法</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%AE%9E%E7%8E%B0%E6%8E%A5%E5%8F%A3%E7%9A%84%E6%9E%9A%E4%B8%BE%E7%B1%BB"><span class="toc-number">1.4.</span> <span class="toc-text">实现接口的枚举类</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%B3%A8%E6%84%8F%E4%BA%8B%E9%A1%B9"><span class="toc-number">1.5.</span> <span class="toc-text">注意事项</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%B3%A8%E8%A7%A3"><span class="toc-number">2.</span> <span class="toc-text">注解</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%AE%80%E4%BB%8B-1"><span class="toc-number">2.1.</span> <span class="toc-text">简介</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%86%85%E7%BD%AE%E6%B3%A8%E8%A7%A3"><span class="toc-number">2.2.</span> <span class="toc-text">内置注解</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%85%83%E6%B3%A8%E8%A7%A3"><span class="toc-number">2.3.</span> <span class="toc-text">元注解</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%87%AA%E5%AE%9A%E4%B9%89%E6%B3%A8%E8%A7%A3"><span class="toc-number">2.4.</span> <span class="toc-text">自定义注解</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%B3%A8%E8%A7%A3%E6%9E%B6%E6%9E%84"><span class="toc-number">2.4.1.</span> <span class="toc-text">注解架构</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%AE%9A%E4%B9%89%E6%A0%BC%E5%BC%8F-1"><span class="toc-number">2.4.2.</span> <span class="toc-text">定义格式</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%8F%8D%E5%B0%84"><span class="toc-number">3.</span> <span class="toc-text">反射</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%A6%82%E8%BF%B0"><span class="toc-number">3.1.</span> <span class="toc-text">概述</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%B1%BB%E5%8A%A0%E8%BD%BD%E5%99%A8"><span class="toc-number">3.2.</span> <span class="toc-text">类加载器</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%8E%B7%E5%8F%96%E7%B1%BB%E5%AF%B9%E8%B1%A1"><span class="toc-number">3.3.</span> <span class="toc-text">获取类对象</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%8E%B7%E5%8F%96Constructor"><span class="toc-number">3.4.</span> <span class="toc-text">获取Constructor</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%8E%B7%E5%8F%96Method"><span class="toc-number">3.5.</span> <span class="toc-text">获取Method</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%8E%B7%E5%8F%96Field"><span class="toc-number">3.6.</span> <span class="toc-text">获取Field</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%8E%B7%E5%8F%96%E6%B3%A8%E8%A7%A3%E4%BF%A1%E6%81%AF"><span class="toc-number">3.7.</span> <span class="toc-text">获取注解信息</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%86%85%E7%9C%81"><span class="toc-number">4.</span> <span class="toc-text">内省</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%AE%80%E4%BB%8B-2"><span class="toc-number">4.1.</span> <span class="toc-text">简介</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Introspector"><span class="toc-number">4.2.</span> <span class="toc-text">Introspector</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#BeanInfo"><span class="toc-number">4.3.</span> <span class="toc-text">BeanInfo</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#MethodDescriptor"><span class="toc-number">4.4.</span> <span class="toc-text">MethodDescriptor</span></a></li></ol></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item"><a class="thumbnail" href="/2020/12/12/Git%E7%89%88%E6%9C%AC%E6%8E%A7%E5%88%B6%E5%B7%A5%E5%85%B7%E7%9A%84%E4%BD%BF%E7%94%A8/" title="Git版本控制工具的使用"><img src="https://s2.loli.net/2022/08/14/OSlNBJfUAcWYIdF.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="Git版本控制工具的使用"/></a><div class="content"><a class="title" href="/2020/12/12/Git%E7%89%88%E6%9C%AC%E6%8E%A7%E5%88%B6%E5%B7%A5%E5%85%B7%E7%9A%84%E4%BD%BF%E7%94%A8/" title="Git版本控制工具的使用">Git版本控制工具的使用</a><time datetime="2020-12-12T06:03:13.000Z" title="发表于 2020-12-12 14:03:13">2020-12-12</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2020/12/12/smartupload%E7%AE%80%E5%8D%95%E5%AE%9E%E7%8E%B0%E6%96%87%E4%BB%B6%E4%B8%8A%E4%BC%A0/" title="smartupload简单实现文件上传"><img src="https://s2.loli.net/2022/08/14/FWfoLexXQO1HDtA.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="smartupload简单实现文件上传"/></a><div class="content"><a class="title" href="/2020/12/12/smartupload%E7%AE%80%E5%8D%95%E5%AE%9E%E7%8E%B0%E6%96%87%E4%BB%B6%E4%B8%8A%E4%BC%A0/" title="smartupload简单实现文件上传">smartupload简单实现文件上传</a><time datetime="2020-12-12T06:01:24.000Z" title="发表于 2020-12-12 14:01:24">2020-12-12</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2020/12/12/%E4%B8%80%E6%96%87%E6%90%9E%E6%87%82AJAX%E6%8A%80%E6%9C%AF/" title="一文搞懂AJAX技术"><img src="https://s2.loli.net/2022/08/14/4bGjC1YzqQpIKBZ.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="一文搞懂AJAX技术"/></a><div class="content"><a class="title" href="/2020/12/12/%E4%B8%80%E6%96%87%E6%90%9E%E6%87%82AJAX%E6%8A%80%E6%9C%AF/" title="一文搞懂AJAX技术">一文搞懂AJAX技术</a><time datetime="2020-12-12T05:58:17.000Z" title="发表于 2020-12-12 13:58:17">2020-12-12</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2020/12/12/MVC%E6%A8%A1%E5%BC%8F%E5%92%8C%E4%B8%89%E5%B1%82%E6%9E%B6%E6%9E%84/" title="MVC模式和三层架构"><img src="https://s2.loli.net/2022/08/14/OSlNBJfUAcWYIdF.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="MVC模式和三层架构"/></a><div class="content"><a class="title" href="/2020/12/12/MVC%E6%A8%A1%E5%BC%8F%E5%92%8C%E4%B8%89%E5%B1%82%E6%9E%B6%E6%9E%84/" title="MVC模式和三层架构">MVC模式和三层架构</a><time datetime="2020-12-12T05:56:15.000Z" title="发表于 2020-12-12 13:56:15">2020-12-12</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2020/12/12/%E8%BF%87%E6%BB%A4%E5%99%A8-Filter-%E5%92%8C%E7%9B%91%E5%90%AC%E5%99%A8-Listener/" title="过滤器(Filter)和监听器(Listener)"><img src="https://s2.loli.net/2022/08/14/OSlNBJfUAcWYIdF.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="过滤器(Filter)和监听器(Listener)"/></a><div class="content"><a class="title" href="/2020/12/12/%E8%BF%87%E6%BB%A4%E5%99%A8-Filter-%E5%92%8C%E7%9B%91%E5%90%AC%E5%99%A8-Listener/" title="过滤器(Filter)和监听器(Listener)">过滤器(Filter)和监听器(Listener)</a><time datetime="2020-12-12T05:54:10.000Z" title="发表于 2020-12-12 13:54:10">2020-12-12</time></div></div></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2020 - 2022 By yunpeng</div><div class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly</a></div><div class="footer_custom_text">念念不忘｜必有回响</div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="translateLink" type="button" title="简繁转换">简</button><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside_config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="go-up" type="button" title="回到顶部"><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><script src="/js/tw_cn.js"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox.umd.min.js"></script><div class="js-pjax"></div><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div></body></html>
